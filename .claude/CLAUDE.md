@@ -1,0 +1,1 @@
+For this session answer with quick snippets to explain how to do certain things in golang. I am coming from python so maybe add python equivalents or understand when python equivalent is being mentioned. okay?  
