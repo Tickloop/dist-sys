@@ -1,0 +1,11 @@
+services:
+  kilo:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - kilo-data:/var/lib/kilo
+  
+volumes:
+  kilo-data:
+    driver: local
