@@ -27,16 +27,13 @@ func NewRouter(cf *config.Config) *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /bucket", CreateBucketHandler)
 	mux.HandleFunc("GET /buckets", ListBucketsHandler)
+	mux.HandleFunc("GET /bucket/{name}", GetBucketHandler)
+	mux.HandleFunc("DELETE /bucket/{name}", DeleteBucketHandler)
 	return mux
 }
 
 type CreateBucketRequest struct {
 	Name string `json:"name"`
-}
-
-type ListBucketRequest struct {
-	Limit  int `json:"limit"`
-	Offset int `json:"offset"`
 }
 
 func CreateBucketHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,4 +74,40 @@ func ListBucketsHandler(w http.ResponseWriter, r *http.Request) {
 
 	buckets := reg.ListBuckets(limit, offset)
 	json.NewEncoder(w).Encode(buckets)
+}
+
+func GetBucketHandler(w http.ResponseWriter, r *http.Request) {
+	cfg.Logger.Info("GetBucketHandler invoked")
+	name := r.PathValue("name")
+	if name == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Empty bucket name"))
+		return
+	}
+
+	b, err := reg.GetBucket(name)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	json.NewEncoder(w).Encode(b)
+}
+
+func DeleteBucketHandler(w http.ResponseWriter, r *http.Request) {
+	cfg.Logger.Info("DeleteBucketHandler invoked")
+	name := r.PathValue("name")
+	if name == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Empty bucket name"))
+		return
+	}
+
+	if err := reg.DeleteBucket(name); err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
