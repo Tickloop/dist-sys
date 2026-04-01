@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 	"time"
 )
 
@@ -69,8 +70,7 @@ func (b Bucket) Serialize() error {
 	return nil
 }
 
-
-// TODO: This method has two failure modes - 
+// TODO: This method has two failure modes -
 // need to communicate better which error occured
 func (r *Registry) CreateBucket(name string) error {
 	if b, ok := r.Buckets[name]; ok {
@@ -89,9 +89,16 @@ func (r *Registry) CreateBucket(name string) error {
 }
 
 func (r *Registry) ListBuckets(limit int, offset int) []Bucket {
+	// naive-sort
+	keys := make([]string, 0, len(r.Buckets))
+	for k := range r.Buckets {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
 	buckets := []Bucket{}
-	for _, bucket := range r.Buckets {
-		buckets = append(buckets, bucket)
+	for _, key := range keys {
+		buckets = append(buckets, r.Buckets[key])
 	}
 
 	if offset >= len(buckets) {

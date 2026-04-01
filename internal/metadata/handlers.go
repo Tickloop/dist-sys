@@ -12,6 +12,7 @@ package metadata
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/tickloop/kilo/internal/config"
 )
@@ -65,13 +66,15 @@ func CreateBucketHandler(w http.ResponseWriter, r *http.Request) {
 
 func ListBucketsHandler(w http.ResponseWriter, r *http.Request) {
 	cfg.Logger.Info("ListBucketsHandler invoked")
-	var req ListBucketRequest
-	json.NewDecoder(r.Body).Decode(&req)
-
-	if req.Limit <= 0 {
-		req.Limit = 25
+	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		limit = 100 // default limit
+	}
+	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+	if err != nil {
+		offset = 0 // default offset
 	}
 
-	buckets := reg.ListBuckets(req.Limit, req.Offset)
+	buckets := reg.ListBuckets(limit, offset)
 	json.NewEncoder(w).Encode(buckets)
 }
