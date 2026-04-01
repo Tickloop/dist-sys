@@ -18,9 +18,11 @@ import (
 
 var (
 	cfg *config.Config = config.LoadConfig()
+	reg *Registry
 )
 
 func NewRouter(cf *config.Config) *http.ServeMux {
+	reg, _ = InitRegistry()
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /bucket", CreateBucketHandler)
 	mux.HandleFunc("GET /buckets", ListBucketsHandler)
@@ -47,9 +49,15 @@ func CreateBucketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := CreateBucket(req.Name); err != nil {
+	if len(req.Name) > 1024 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Bucket name must be less than 1024 characters"))
+		return
+	}
+
+	if err := reg.CreateBucket(req.Name); err != nil {
 		w.WriteHeader(http.StatusConflict)
-		w.Write([]byte("Duplicate bucket name"))
+		w.Write([]byte(err.Error()))
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -64,6 +72,6 @@ func ListBucketsHandler(w http.ResponseWriter, r *http.Request) {
 		req.Limit = 25
 	}
 
-	buckets := ListBuckets(req.Limit, req.Offset)
+	buckets := reg.ListBuckets(req.Limit, req.Offset)
 	json.NewEncoder(w).Encode(buckets)
 }
