@@ -4,6 +4,9 @@ run:
 build:
 	- go build -o bin/server cmd/server/main.go
 
+live:
+	- air --build.cmd "go build -o bin/server cmd/server/main.go" --build.entrypoint "./bin/server"
+
 # using gotest instead of go test to get better output formatting
 test:
 	- gotest -v ./...
@@ -16,3 +19,7 @@ up:
 	- docker compose up -d
 down:
 	- docker compose down --remove-orphans
+
+clean:
+	- rm -rf ./bin
+	- rm -rf ./registry.json
