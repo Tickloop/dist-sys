@@ -36,7 +36,7 @@ func startServer(cfg *config.Config) {
 	switch cfg.ServiceType {
 	case "METADATA":
 		cfg.Logger.Info("Running metadata service...")
-		mux = (&metadata.MetadataService_v1{}).NewServeMux()
+		mux = (&metadata.MetadataService_v1{}).NewServeMux(cfg)
 	case "STORAGE":
 		cfg.Logger.Info("Running storage service...")
 		mux = (&storage.StorageService_v1{}).NewServeMux(cfg)
@@ -48,7 +48,7 @@ func startServer(cfg *config.Config) {
 	// router := http.NewServeMux()
 	// router.Handle("/api/v1/", http.StripPrefix("/api/v1", common.Chain(mux, common.MVerifyContentTypeHeader)))
 	server := &http.Server{
-		Addr: ":8080",
+		Addr: ":" + cfg.Port,
 		Handler: common.Chain(
 			mux,
 			common.MLogPath,

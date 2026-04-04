@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/tickloop/kilo/internal/config"
@@ -38,25 +39,28 @@ func (s *StorageService_v1) GetShard(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Error loading shard: %s", err.Error())
+		return
 	}
 	w.Header().Set("Content-Type", "application/octet-stream")
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(data)))
+	w.WriteHeader(http.StatusOK)
 	w.Write(data)
 }
 
 func (s *StorageService_v1) PutShard(w http.ResponseWriter, r *http.Request) {
 	key := r.PathValue("key")
-	data := make([]byte, 64*1024) // 64 KB max shard size
-
-	if _, err := r.Body.Read(data); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "Error writing shard: %s", err.Error())
+	r.Body = http.MaxBytesReader(w, r.Body, config.SHARD_SIZE)
+	data, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "request body too large", http.StatusRequestEntityTooLarge)
+		return
 	}
 
 	if err := s.reg.PutShard(key, data); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Error writing shard: %s", err.Error())
+		return
 	}
 
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK)
 }
