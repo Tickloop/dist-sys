@@ -39,7 +39,7 @@ func startServer(cfg *config.Config) {
 		mux = (&metadata.MetadataService_v1{}).NewServeMux()
 	case "STORAGE":
 		cfg.Logger.Info("Running storage service...")
-		mux = (&storage.StorageService_v1{}).NewServeMux()
+		mux = (&storage.StorageService_v1{}).NewServeMux(cfg)
 	default:
 		cfg.Logger.Warn("Default case triggered in switch - should be impossible")
 	}
