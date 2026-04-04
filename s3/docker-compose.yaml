@@ -1,11 +1,26 @@
 services:
-  kilo:
+  kilo-storage:
     build: .
     ports:
       - "8080:8080"
     volumes:
-      - kilo-data:/var/lib/kilo
+      - kilo-storage:/var/lib/kilo
+    environment:
+      - KILO_SERVICE_TYPE=STORAGE
+  
+
+  kilo-metadata:
+    build: .
+    ports:
+      - "8081:8080"
+    volumes:
+      - kilo-metadata:/var/lib/kilo
+    environment:
+      - KILO_SERVICE_TYPE=METADATA
+    
   
 volumes:
-  kilo-data:
+  kilo-storage:
+    driver: local
+  kilo-metadata:
     driver: local

@@ -23,3 +23,10 @@ func MVerifyContentTypeHeader(h http.Handler) http.Handler {
 		h.ServeHTTP(w, r)
 	})
 }
+
+func MLogPath(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		h.ServeHTTP(w, r)
+		w.Header().Add("x-path", r.URL.Path)
+	})
+}
