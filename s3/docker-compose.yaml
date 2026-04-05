@@ -9,6 +9,7 @@ services:
       - KILO_SERVICE_TYPE=STORAGE
       - KILO_DATA_DIR=/var/lib/kilo
       - KILO_STORAGE_SERVICE_URL=http://kilo-storage:8080
+      - KILO_PORT=8080
 
   kilo-metadata:
     build: .
@@ -20,6 +21,7 @@ services:
       - KILO_SERVICE_TYPE=METADATA
       - KILO_DATA_DIR=/var/lib/kilo
       - KILO_STORAGE_SERVICE_URL=http://kilo-storage:8080
+      - KILO_PORT=8080
     
   
 volumes:
