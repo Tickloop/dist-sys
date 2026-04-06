@@ -27,9 +27,9 @@ go get github.com/hanwen/go-fuse/v2
 ## Checklist
 
 **Phase 0 — Virtual Disk**
-- [ ] Create a 10MB blank image with `dd`
-- [ ] Attach as a loop device with `losetup`
-- [ ] Verify with `lsblk` and `stat`
+- [x] Create a 10MB blank image with `dd`
+<!-- - [ ] Attach as a loop device with `losetup` -->
+<!-- - [ ] Verify with `lsblk` and `stat` -->
 
 **Phase 1 — On-Disk Format**
 - [ ] Define `Superblock`, `Inode`, `DirEntry` structs with fixed-size types only
